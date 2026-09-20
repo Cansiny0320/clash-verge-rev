@@ -21,6 +21,8 @@ import {
   type ResolvedProxyMember,
 } from '@/types/proxy-view'
 
+import { ProxySpeed } from './proxy-speed'
+
 interface Props {
   group: ProxyGroupView
   member: ResolvedProxyMember
@@ -134,7 +136,11 @@ export const ProxyItem = (props: Props) => {
 
         <ListItemIcon
           sx={{
+            flexDirection: 'column',
+            alignItems: 'flex-end',
             justifyContent: 'flex-end',
+            flexShrink: 0,
+            '& .the-delay, & .the-check': { py: 0 },
             color: 'primary.main',
             display: isPreset ? 'none' : '',
           }}
@@ -187,6 +193,7 @@ export const ProxyItem = (props: Props) => {
               sx={{ fontSize: 16 }}
             />
           )}
+          <ProxySpeed group={group.name} member={member} />
         </ListItemIcon>
       </ListItemButton>
     </ListItem>

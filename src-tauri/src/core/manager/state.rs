@@ -527,7 +527,7 @@ mod readiness_tests {
 }
 
 #[cfg(target_os = "windows")]
-fn create_and_assign_sidecar_job(child_pid: u32) -> Result<OwnedHandle> {
+pub(crate) fn create_and_assign_sidecar_job(child_pid: u32) -> Result<OwnedHandle> {
     unsafe {
         let raw_job: HANDLE = CreateJobObjectW(std::ptr::null(), std::ptr::null());
         if raw_job.is_null() {

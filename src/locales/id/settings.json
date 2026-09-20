@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "Saat ini pada Versi Terbaru",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "forkUpdateUnavailable": "Cannot check Cansiny0320 updates: no update has been published, or the source is unreachable."
         },
         "fields": {
           "backupSetting": "Pengaturan Cadangan",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "Deteksi Latensi Otomatis",
         "autoDelayDetectionInterval": "Interval Deteksi Latensi Otomatis",
         "defaultLatencyTest": "Tes Latensi Default",
-        "defaultLatencyTimeout": "Waktu Habis Latensi Default"
+        "defaultLatencyTimeout": "Waktu Habis Latensi Default",
+        "downloadTestUrl": "Download test URL"
       },
       "tooltips": {
         "autoCloseConnections": "Hentikan koneksi yang sudah ada saat pemilihan grup proksi atau mode proksi berubah",
         "enableBuiltinEnhanced": "Penanganan kompatibilitas untuk file konfigurasi",
         "autoDelayDetection": "Secara berkala menguji latensi node saat ini di latar belakang",
-        "defaultLatencyTest": "Digunakan hanya untuk pengujian permintaan klien HTTP dan tidak akan mempengaruhi file konfigurasi"
+        "defaultLatencyTest": "Digunakan hanya untuk pengujian permintaan klien HTTP dan tidak akan mempengaruhi file konfigurasi",
+        "downloadTestUrl": "Leave empty for Cloudflare. HTTP/HTTPS only, without embedded credentials."
       },
       "options": {
         "proxyLayoutColumns": {

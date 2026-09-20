@@ -4,6 +4,7 @@ import {
   type Update,
 } from '@tauri-apps/plugin-updater'
 import { compareVersions as compareSemver } from 'compare-versions'
+import i18n from 'i18next'
 
 import { version as appVersion } from '@root/package.json'
 
@@ -72,7 +73,20 @@ const localVersionNormalized = normalizeVersion(appVersion)
 export const checkUpdateSafe = async (
   options?: CheckOptions,
 ): Promise<Update | null> => {
-  const result = await check({ ...(options ?? {}), allowDowngrades: false })
+  const result = await check({
+    timeout: 15000,
+    ...(options ?? {}),
+    allowDowngrades: false,
+  }).catch((error: unknown) => {
+    throw new Error(
+      i18n.t(
+        (resources) =>
+          resources.settings.components.verge.advanced.notifications
+            .forkUpdateUnavailable,
+      ),
+      { cause: error },
+    )
+  })
   if (!result) return null
 
   const remoteVersion = resolveRemoteVersion(result)

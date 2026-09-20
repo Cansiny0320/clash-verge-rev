@@ -340,6 +340,7 @@ class DelayManager {
     group: string,
     timeout: number,
     concurrency = 36,
+    signal?: AbortSignal,
   ) {
     debugLog(
       `[DelayManager] 批量测试延迟开始，组: ${group}, 数量: ${proxies.length}, 并发数: ${concurrency}`,
@@ -354,6 +355,7 @@ class DelayManager {
     const startTime = Date.now()
 
     const help = async (): Promise<void> => {
+      if (signal?.aborted) return
       const currMember = proxies[index++]
       if (!currMember) return
       const currName = currMember.ref.name
@@ -392,6 +394,11 @@ class DelayManager {
     try {
       await Promise.all(promiseList)
     } finally {
+      if (signal?.aborted) {
+        names.forEach((name) => {
+          if (this.getDelay(name, group) === -2) this.setDelay(name, group, -1)
+        })
+      }
       // Always release the batch and notify; otherwise failures leave stale sort state.
       const remaining = (this.activeBatches.get(group) ?? 1) - 1
       if (remaining > 0) {

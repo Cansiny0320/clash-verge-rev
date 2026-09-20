@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "در حال حاضر در آخرین نسخه",
-          "versionCopied": "نسخه در کلیپ بورد کپی شد"
+          "versionCopied": "نسخه در کلیپ بورد کپی شد",
+          "forkUpdateUnavailable": "Cannot check Cansiny0320 updates: no update has been published, or the source is unreachable."
         },
         "fields": {
           "backupSetting": "تنظیمات پشتیبان گیری",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "تشخیص تأخیر خودکار",
         "autoDelayDetectionInterval": "فاصله تشخیص تأخیر خودکار",
         "defaultLatencyTest": "آزمون تأخیر پیش‌فرض",
-        "defaultLatencyTimeout": "زمان انتظار تأخیر پیش‌فرض"
+        "defaultLatencyTimeout": "زمان انتظار تأخیر پیش‌فرض",
+        "downloadTestUrl": "Download test URL"
       },
       "tooltips": {
         "autoCloseConnections": "اتصالات برقرار شده را هنگام تغییر انتخاب گروه پروکسی یا حالت پروکسی خاتمه دهید",
         "enableBuiltinEnhanced": "مدیریت سازگاری برای فایل پیکربندی",
         "autoDelayDetection": "به‌صورت دوره‌ای تأخیر گره فعلی را در پس‌زمینه آزمایش می‌کند",
-        "defaultLatencyTest": "فقط برای تست درخواست‌های کلاینت HTTP استفاده می‌شود و بر فایل پیکربندی تأثیری نخواهد داشت"
+        "defaultLatencyTest": "فقط برای تست درخواست‌های کلاینت HTTP استفاده می‌شود و بر فایل پیکربندی تأثیری نخواهد داشت",
+        "downloadTestUrl": "Leave empty for Cloudflare. HTTP/HTTPS only, without embedded credentials."
       },
       "options": {
         "proxyLayoutColumns": {

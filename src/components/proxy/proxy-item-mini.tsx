@@ -11,6 +11,8 @@ import {
   type ResolvedProxyMember,
 } from '@/types/proxy-view'
 
+import { ProxySpeed } from './proxy-speed'
+
 interface Props {
   group: ProxyGroupView
   member: ResolvedProxyMember
@@ -155,7 +157,12 @@ export const ProxyItemMini = (props: Props) => {
         )}
       </Box>
       <Box
-        sx={{ ml: 0.5, color: 'primary.main', display: isPreset ? 'none' : '' }}
+        sx={{
+          ml: 0.5,
+          flexShrink: 0,
+          color: 'primary.main',
+          display: isPreset ? 'none' : '',
+        }}
       >
         {!unresolved && delayValue === -2 && (
           <Widget>
@@ -207,6 +214,7 @@ export const ProxyItemMini = (props: Props) => {
               sx={{ fontSize: 16, mr: 0.5, display: 'block' }}
             />
           )}
+        <ProxySpeed group={group.name} member={member} />
       </Box>
       {!unresolved && group.fixed && group.fixed === name && (
         // 展示 fixed 状态

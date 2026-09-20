@@ -593,6 +593,17 @@ export interface TranslationResources {
           sortName: string
         }
       }
+      speed: {
+        cancelled: string
+        description: string
+        done: string
+        error: string
+        finished: string
+        queued: string
+        start: string
+        stop: string
+        testing: string
+      }
     }
     rules: {
       feedback: {
@@ -697,6 +708,7 @@ export interface TranslationResources {
               vergeVersion: string
             }
             notifications: {
+              forkUpdateUnavailable: string
               latestVersion: string
               versionCopied: string
             }
@@ -1100,6 +1112,7 @@ export interface TranslationResources {
             autoLogClean: string
             defaultLatencyTest: string
             defaultLatencyTimeout: string
+            downloadTestUrl: string
             enableBuiltinEnhanced: string
             proxyLayoutColumns: string
           }
@@ -1117,6 +1130,7 @@ export interface TranslationResources {
             autoCloseConnections: string
             autoDelayDetection: string
             defaultLatencyTest: string
+            downloadTestUrl: string
             enableBuiltinEnhanced: string
           }
         }

@@ -1,5 +1,7 @@
 import { context, getOctokit } from '@actions/github'
 
+import { requireForkRepository, validatePlatforms } from './fork-updates.mjs'
+
 import { resolveUpdateLog } from './updatelog.mjs'
 
 const UPDATE_TAG_NAME = 'updater'
@@ -11,6 +13,7 @@ async function resolveUpdater() {
     throw new Error('GITHUB_TOKEN is required')
   }
 
+  requireForkRepository(context.repo)
   const options = { owner: context.repo.owner, repo: context.repo.repo }
   const github = getOctokit(process.env.GITHUB_TOKEN)
 
@@ -31,6 +34,7 @@ async function resolveUpdater() {
   })
 
   const updateData = {
+    version: tag.name.replace(/^v/, ''),
     name: tag.name,
     notes: await resolveUpdateLog(tag.name), // use Changelog.md
     pub_date: new Date().toISOString(),
@@ -72,7 +76,7 @@ async function resolveUpdater() {
     }
   })
 
-  await Promise.allSettled(promises)
+  await Promise.all(promises)
   console.log(updateData)
 
   Object.entries(updateData.platforms).forEach(([key, value]) => {
@@ -82,11 +86,13 @@ async function resolveUpdater() {
     }
   })
 
+  validatePlatforms(updateData.platforms)
+
   const updateDataNew = JSON.parse(JSON.stringify(updateData))
 
   Object.entries(updateDataNew.platforms).forEach(([key, value]) => {
     if (value.url) {
-      updateDataNew.platforms[key].url = 'https://update.hwdns.net/' + value.url
+      updateDataNew.platforms[key].url = value.url
     } else {
       console.log(`[Error]: updateDataNew.platforms.${key} is null`)
     }
@@ -133,7 +139,12 @@ async function getSignature(url) {
     headers: { 'Content-Type': 'application/octet-stream' },
   })
 
+  if (!response.ok)
+    throw new Error(`Signature download failed: HTTP ${response.status}`)
   return response.text()
 }
 
-resolveUpdater().catch(console.error)
+resolveUpdater().catch((error) => {
+  console.error(error)
+  process.exitCode = 1
+})

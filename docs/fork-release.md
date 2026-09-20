@@ -1,0 +1,23 @@
+# Fork release configuration
+
+Application updates are read exclusively from `Cansiny0320/clash-verge-rev`. The normal build reads the `updater/update.json` release asset; fixed-WebView2 builds read `updater/update-fixed-webview2.json`. The updater script also generates `updater-alpha/update.json` for a prerelease channel. No endpoint falls back to the upstream application or its download mirrors. Mihomo itself continues to use MetaCubeX releases.
+
+The public key is pinned in all four Tauri configurations. The matching private key was generated locally outside the repository under the current user's LocalAppData `clash-verge-build-tools/signing/cansiny-clash-verge.key`. Back it up securely. Do not commit it. The key has no password and must be protected as a secret file.
+
+Before a release, the repository owner must set Actions secret `TAURI_PRIVATE_KEY` to that private key's contents; `TAURI_KEY_PASSWORD` is empty for this key. No remote secret has been configured by this change. The inherited macOS signing/notarization jobs additionally need the owner's Apple credentials. Windows updater signatures are distinct from Windows Authenticode certificates.
+
+Publish signed installer artifacts and their `.sig` assets in a versioned release before generating an update manifest. `scripts/updater.mjs` and `scripts/updater-fixed-webview2.mjs` reject unsigned or foreign-repository artifact URLs. Their legacy `*-proxy.json` aliases also contain direct fork download URLs. The fixed-WebView2 manifest must run after the normal manifest has created the `updater` release.
+
+Before the first release, checks report that the fork update source is unavailable; this is not proof that the installed version is current. A new cache directory prevents the fork from installing an upstream package cached by the previous application. The first fork build must be installed manually; upstream installations trust the upstream signing key.
+
+The owner authorized publishing v2.5.5 of this fork and installing it over the existing Windows application. This release targets Windows x64; publish the locally signed installer and its signature with matching source, then publish the stable update manifest. Do not advertise unbuilt platforms. No Actions signing secret is required for this local release process; CI signing still requires the configuration described above.
+
+## Download testing
+
+The manual group latency button first measures latency, then downloads through one node at a time. Clicking a node's latency/check control performs the same measurement for that node only, without selecting it or clearing other nodes' results. A node click during an existing test does not replace or cancel that test. Use the group's stop button to stop an active measurement. Automatic latency checks remain latency-only. Each node samples for at most five seconds after response headers or 50,000,000 bytes, with a separate ten-second connection/header deadline. Protocol overhead and socket buffering can consume additional bytes. Results use decimal MB/s.
+
+The default is Cloudflare's download endpoint. The miscellaneous settings dialog accepts a custom HTTP(S) file URL; blank restores the default. Redirects, HTML responses, HTTP errors and empty bodies are reported as failures. There is no upload test or automatic server fallback.
+
+An isolated bundled Mihomo process uses temporary provider and GeoData copies, loopback listeners, independent credentials and no TUN/system-proxy setup. Windows also places the process in a kill-on-close job. When the active configuration enables TUN, the test core retains an explicit outbound `interface-name`, or selects a connected non-TUN default route using the Windows route plus interface metric. Selection is repeated for each batch; no host routes are modified. A missing safe default route fails explicitly. On other platforms, testing with TUN currently requires an explicit outbound `interface-name`. Results are tied to provider identity and cleared on profile changes. Testing a nested group uses its selected leaf at the start of the batch.
+
+Current compatibility limits: rule-set-based DNS nameserver policies fail explicitly; a file provider requires a readable local cache, while a remote provider without one is loaded independently. A changed remote subscription can therefore cause a node identity error. Download results describe throughput to the selected server, not every destination or a guaranteed line maximum. Windows validation includes controlled local proxies, native default-route discovery and a bounded real subscription download while the production TUN remains enabled. This does not establish compatibility with every routing/VPN configuration or with network changes during a batch.

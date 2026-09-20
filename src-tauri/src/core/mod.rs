@@ -13,6 +13,7 @@ pub mod proxy_control;
 pub mod proxy_view;
 pub mod runstate;
 mod runtime_bundle;
+pub(crate) use runtime_bundle::GEO_ASSETS;
 pub mod service;
 pub mod sysopt;
 pub mod timer;

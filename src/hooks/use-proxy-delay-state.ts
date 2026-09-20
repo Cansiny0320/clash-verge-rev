@@ -2,7 +2,9 @@ import { useLockFn } from 'ahooks'
 import { useCallback, useEffect, useReducer } from 'react'
 
 import { useVerge } from '@/hooks/use-verge'
+import { useProxiesData } from '@/providers/app-data-context'
 import delayManager, { type DelayUpdate } from '@/services/delay'
+import { speedTestStore } from '@/services/speedtest'
 import {
   isInteractableMember,
   memberDetails,
@@ -39,6 +41,7 @@ export function useProxyDelayState(
   const isPreset = unresolved || PRESET_PROXY_NAMES.includes(name)
   const [delayState, setDelayState] = useReducer(identity, INITIAL_DELAY)
   const { verge } = useVerge()
+  const { proxyView } = useProxiesData()
   const timeout = verge?.default_latency_timeout || 10000
 
   useEffect(() => {
@@ -84,9 +87,8 @@ export function useProxyDelayState(
   }, [updateDelay])
 
   const onDelay = useLockFn(async () => {
-    if (!isInteractableMember(member)) return
-    setDelayState({ delay: -2, updatedAt: Date.now() })
-    setDelayState(await delayManager.checkDelay(member, groupName, timeout))
+    if (!isInteractableMember(member) || !proxyView) return
+    await speedTestStore.runSingle(groupName, member, proxyView, timeout)
   })
 
   return {

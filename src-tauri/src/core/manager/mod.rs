@@ -1,6 +1,8 @@
 mod config;
 mod lifecycle;
 mod state;
+#[cfg(target_os = "windows")]
+pub(crate) use state::create_and_assign_sidecar_job;
 
 use anyhow::Result;
 use arc_swap::{ArcSwap, ArcSwapOption};

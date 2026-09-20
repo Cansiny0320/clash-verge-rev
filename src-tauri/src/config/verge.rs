@@ -119,6 +119,7 @@ pub struct IVerge {
     pub auto_check_update: Option<bool>,
 
     pub default_latency_test: Option<String>,
+    pub download_test_url: Option<String>,
 
     pub default_latency_timeout: Option<i16>,
 
@@ -471,6 +472,7 @@ impl IVerge {
         patch!(auto_close_connection);
         patch!(auto_check_update);
         patch!(default_latency_test);
+        patch!(download_test_url);
         patch!(default_latency_timeout);
         patch!(enable_auto_delay_detection);
         patch!(auto_delay_detection_interval_minutes);

@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "Actualmente está en la última versión",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "forkUpdateUnavailable": "Cannot check Cansiny0320 updates: no update has been published, or the source is unreachable."
         },
         "fields": {
           "backupSetting": "Configuración de copia de seguridad",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "Detección automática de latencia",
         "autoDelayDetectionInterval": "Intervalo de detección automática de latencia",
         "defaultLatencyTest": "Enlace de prueba de latencia predeterminado",
-        "defaultLatencyTimeout": "Tiempo de espera de la prueba de latencia"
+        "defaultLatencyTimeout": "Tiempo de espera de la prueba de latencia",
+        "downloadTestUrl": "Download test URL"
       },
       "tooltips": {
         "autoCloseConnections": "Cierra las conexiones establecidas cuando se cambia el nodo seleccionado en el grupo de proxy o el modo de proxy.",
         "enableBuiltinEnhanced": "Procesamiento de compatibilidad de archivos de configuración",
         "autoDelayDetection": "Prueba periódicamente la latencia del nodo actual en segundo plano",
-        "defaultLatencyTest": "Solo se utiliza para pruebas de solicitudes de clientes HTTP y no afectará al archivo de configuración."
+        "defaultLatencyTest": "Solo se utiliza para pruebas de solicitudes de clientes HTTP y no afectará al archivo de configuración.",
+        "downloadTestUrl": "Leave empty for Cloudflare. HTTP/HTTPS only, without embedded credentials."
       },
       "options": {
         "proxyLayoutColumns": {

@@ -118,5 +118,16 @@
         "PASS": "Eşleştiğinde bu kuralı atlar"
       }
     }
+  },
+  "speed": {
+    "start": "Test latency and download speed (up to 50 MB per node)",
+    "stop": "Stop testing ({{completed}}/{{total}})",
+    "queued": "Waiting",
+    "testing": "Downloading…",
+    "done": "Complete",
+    "error": "Download failed",
+    "cancelled": "Stopped",
+    "finished": "Complete",
+    "description": "Download speed to the configured server; up to 5 seconds or 50 MB per node."
   }
 }

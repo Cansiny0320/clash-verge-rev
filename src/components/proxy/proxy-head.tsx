@@ -11,7 +11,9 @@ import {
   SortByAlphaRounded,
   SortRounded,
 } from '@mui/icons-material'
+import StopRounded from '@mui/icons-material/StopRounded'
 import { Box, IconButton, TextField, type SxProps } from '@mui/material'
+import { useSyncExternalStore } from 'react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -19,6 +21,7 @@ import { BaseSearchBox } from '@/components/base'
 import { useVerge } from '@/hooks/use-verge'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
+import { speedTestStore } from '@/services/speedtest'
 import { debugLog } from '@/utils/debug'
 import { isValidUrl } from '@/utils/network'
 
@@ -58,6 +61,12 @@ export const ProxyHead = ({
   } = headState
 
   const { t } = useTranslation()
+  const batch = useSyncExternalStore(
+    speedTestStore.subscribe,
+    speedTestStore.batch,
+  )
+  const testing = batch?.group === groupName
+
   const [autoFocus, setAutoFocus] = useState(false)
 
   useEffect(() => {
@@ -89,9 +98,21 @@ export const ProxyHead = ({
       <IconButton
         size="small"
         color="inherit"
-        title={t('proxies.page.tooltips.delayCheck')}
+        disabled={!!batch && (!testing || batch.stopping)}
+        title={
+          testing
+            ? t('proxies.speed.stop', {
+                completed: batch.completed,
+                total: batch.total,
+              })
+            : t('proxies.speed.start')
+        }
         onClick={() => {
           debugLog(`[ProxyHead] 点击延迟测试按钮，组: ${groupName}`)
+          if (testing) {
+            onCheckDelay()
+            return
+          }
           // Remind the user that it is custom test url
           if (testUrl?.trim() && textState !== 'filter') {
             debugLog(`[ProxyHead] 使用自定义测试URL: ${testUrl}`)
@@ -104,8 +125,14 @@ export const ProxyHead = ({
           onCheckDelay()
         }}
       >
-        <NetworkCheckRounded />
+        {testing ? <StopRounded /> : <NetworkCheckRounded />}
       </IconButton>
+
+      {testing && (
+        <Box component="span" sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+          {batch.completed}/{batch.total}
+        </Box>
+      )}
 
       <IconButton
         size="small"

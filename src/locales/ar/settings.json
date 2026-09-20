@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "أنت على أحدث إصدار حاليًا",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "forkUpdateUnavailable": "Cannot check Cansiny0320 updates: no update has been published, or the source is unreachable."
         },
         "fields": {
           "backupSetting": "إعداد النسخ الاحتياطي",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "اكتشاف التأخير التلقائي",
         "autoDelayDetectionInterval": "الفاصل الزمني لاكتشاف التأخير التلقائي",
         "defaultLatencyTest": "اختبار التأخير الافتراضي",
-        "defaultLatencyTimeout": "مهلة التأخير الافتراضية"
+        "defaultLatencyTimeout": "مهلة التأخير الافتراضية",
+        "downloadTestUrl": "Download test URL"
       },
       "tooltips": {
         "autoCloseConnections": "إنهاء الاتصالات القائمة عند تغيير اختيار مجموعة الوكيل أو وضع الوكيل",
         "enableBuiltinEnhanced": "معالجة توافق ملف التكوين",
         "autoDelayDetection": "يختبر زمن استجابة العقدة الحالية على نحو دوري في الخلفية",
-        "defaultLatencyTest": "يُستخدم فقط لاختبار طلب HTTP العميل. لن يؤثر على ملف التكوين"
+        "defaultLatencyTest": "يُستخدم فقط لاختبار طلب HTTP العميل. لن يؤثر على ملف التكوين",
+        "downloadTestUrl": "Leave empty for Cloudflare. HTTP/HTTPS only, without embedded credentials."
       },
       "options": {
         "proxyLayoutColumns": {

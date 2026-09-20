@@ -5,12 +5,14 @@ import SearchOffRounded from '@mui/icons-material/SearchOffRounded'
 import SearchRounded from '@mui/icons-material/SearchRounded'
 import SortByAlphaRounded from '@mui/icons-material/SortByAlphaRounded'
 import SortRounded from '@mui/icons-material/SortRounded'
+import StopRounded from '@mui/icons-material/StopRounded'
 import VisibilityOffRounded from '@mui/icons-material/VisibilityOffRounded'
 import VisibilityRounded from '@mui/icons-material/VisibilityRounded'
 import WifiTetheringOffRounded from '@mui/icons-material/WifiTetheringOffRounded'
 import WifiTetheringRounded from '@mui/icons-material/WifiTetheringRounded'
 import { Box, IconButton, type SxProps, TextField } from '@mui/material'
 import { useDebounceFn } from 'ahooks'
+import { useSyncExternalStore } from 'react'
 import { memo, useEffect, useRef } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
@@ -18,6 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { useVerge } from '@/hooks/use-verge'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
+import { speedTestStore } from '@/services/speedtest'
 import { isValidUrl } from '@/utils/network'
 
 import { BaseSearchBox, type SearchState } from '../base'
@@ -60,6 +63,11 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
   } = headState
 
   const { t } = useTranslation()
+  const batch = useSyncExternalStore(
+    speedTestStore.subscribe,
+    speedTestStore.batch,
+  )
+  const testing = batch?.group === groupName
 
   const { verge } = useVerge()
   const defaultLatencyUrl =
@@ -165,13 +173,25 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
       <IconButton
         size="small"
         color="inherit"
-        title={t('proxies.page.tooltips.delayCheck')}
+        disabled={!!batch && (!testing || batch.stopping)}
+        title={
+          testing
+            ? t('proxies.speed.stop', {
+                completed: batch.completed,
+                total: batch.total,
+              })
+            : t('proxies.speed.start')
+        }
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
           if (!headState.open)
             // eslint-disable-next-line @eslint-react/dom-no-flush-sync
             flushSync(() => onHeadState({ open: true }))
+          if (testing) {
+            onCheckDelay()
+            return
+          }
           // Remind the user that it is custom test url
           if (testUrl?.trim() && textState !== 'filter') {
             onHeadState({ textState: 'url' })
@@ -183,8 +203,18 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
           onCheckDelay()
         }}
       >
-        <NetworkCheckRounded fontSize="inherit" />
+        {testing ? (
+          <StopRounded fontSize="inherit" />
+        ) : (
+          <NetworkCheckRounded fontSize="inherit" />
+        )}
       </IconButton>
+
+      {testing && (
+        <Box component="span" sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+          {batch.completed}/{batch.total}
+        </Box>
+      )}
 
       <IconButton
         size="small"

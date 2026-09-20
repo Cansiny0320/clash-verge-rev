@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "Şu Anda En Son Sürümdesiniz",
-          "versionCopied": "Sürüm panoya kopyalandı"
+          "versionCopied": "Sürüm panoya kopyalandı",
+          "forkUpdateUnavailable": "Cannot check Cansiny0320 updates: no update has been published, or the source is unreachable."
         },
         "fields": {
           "backupSetting": "Yedekleme Ayarı",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "Otomatik Gecikme Tespiti",
         "autoDelayDetectionInterval": "Otomatik Gecikme Tespiti Aralığı",
         "defaultLatencyTest": "Varsayılan Gecikme Testi",
-        "defaultLatencyTimeout": "Varsayılan Gecikme Zaman Aşımı"
+        "defaultLatencyTimeout": "Varsayılan Gecikme Zaman Aşımı",
+        "downloadTestUrl": "Download test URL"
       },
       "tooltips": {
         "autoCloseConnections": "Vekil grup seçimi veya vekil modu değiştiğinde kurulan bağlantıları sonlandır",
         "enableBuiltinEnhanced": "Yapılandırma dosyası için uyumluluk işleme",
         "autoDelayDetection": "Arka planda mevcut düğümün gecikmesini periyodik olarak test eder",
-        "defaultLatencyTest": "Yalnızca HTTP istemci isteği testi için kullanılır ve yapılandırma dosyasında bir fark yaratmaz"
+        "defaultLatencyTest": "Yalnızca HTTP istemci isteği testi için kullanılır ve yapılandırma dosyasında bir fark yaratmaz",
+        "downloadTestUrl": "Leave empty for Cloudflare. HTTP/HTTPS only, without embedded credentials."
       },
       "options": {
         "proxyLayoutColumns": {

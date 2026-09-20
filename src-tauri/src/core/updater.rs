@@ -42,7 +42,7 @@ struct UpdateCacheMeta {
 
 impl SilentUpdater {
     fn cache_dir() -> Result<PathBuf> {
-        Ok(dirs::app_home_dir()?.join("update_cache"))
+        Ok(dirs::app_home_dir()?.join("update_cache_cansiny"))
     }
 
     fn write_cache(bytes: &[u8], version: &str) -> Result<()> {

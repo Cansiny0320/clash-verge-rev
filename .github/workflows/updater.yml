@@ -31,6 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-update-for-fixed-webview2:
+    needs: release-update
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

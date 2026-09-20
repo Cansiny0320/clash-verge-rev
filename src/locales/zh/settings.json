@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "当前已是最新版本",
-          "versionCopied": "Verge 版本已复制到剪贴板"
+          "versionCopied": "Verge 版本已复制到剪贴板",
+          "forkUpdateUnavailable": "无法检查 Cansiny0320 的更新源：尚未发布更新，或网络暂时不可用。"
         },
         "fields": {
           "backupSetting": "备份设置",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "自动延迟检测",
         "autoDelayDetectionInterval": "自动延迟检测间隔",
         "defaultLatencyTest": "默认测试链接",
-        "defaultLatencyTimeout": "测试超时时间"
+        "defaultLatencyTimeout": "测试超时时间",
+        "downloadTestUrl": "下载测速地址"
       },
       "tooltips": {
         "autoCloseConnections": "当代理组选中节点或代理模式变动时，关闭已建立的连接",
         "enableBuiltinEnhanced": "配置文件的兼容性处理",
         "autoDelayDetection": "后台定时检测当前节点延迟",
-        "defaultLatencyTest": "仅用于 HTTP 客户端请求测试，不会对配置文件产生影响"
+        "defaultLatencyTest": "仅用于 HTTP 客户端请求测试，不会对配置文件产生影响",
+        "downloadTestUrl": "留空使用 Cloudflare；支持 HTTP/HTTPS，不支持含账号密码的地址。"
       },
       "options": {
         "proxyLayoutColumns": {

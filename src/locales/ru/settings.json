@@ -191,7 +191,8 @@
         },
         "notifications": {
           "latestVersion": "Обновление не требуется",
-          "versionCopied": "Версия скопирована в буфер обмена"
+          "versionCopied": "Версия скопирована в буфер обмена",
+          "forkUpdateUnavailable": "Cannot check Cansiny0320 updates: no update has been published, or the source is unreachable."
         },
         "fields": {
           "backupSetting": "Настройки резервного копирования",
@@ -415,13 +416,15 @@
         "autoDelayDetection": "Автоматическое измерение задержки",
         "autoDelayDetectionInterval": "Интервал автоматического измерения задержки",
         "defaultLatencyTest": "URL для теста задержки",
-        "defaultLatencyTimeout": "Таймаут задержки по умолчанию"
+        "defaultLatencyTimeout": "Таймаут задержки по умолчанию",
+        "downloadTestUrl": "Download test URL"
       },
       "tooltips": {
         "autoCloseConnections": "Закрывать установленные соединения при изменении выбора группы прокси или режима прокси",
         "enableBuiltinEnhanced": "Обработка совместимости для файла конфигурации",
         "autoDelayDetection": "Периодически проверяет задержку текущего узла в фоновом режиме",
-        "defaultLatencyTest": "Используется только для тестирования HTTP-запросов клиента и не влияет на файл конфигурации"
+        "defaultLatencyTest": "Используется только для тестирования HTTP-запросов клиента и не влияет на файл конфигурации",
+        "downloadTestUrl": "Leave empty for Cloudflare. HTTP/HTTPS only, without embedded credentials."
       },
       "options": {
         "proxyLayoutColumns": {

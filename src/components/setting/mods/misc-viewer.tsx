@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { BaseDialog, DialogRef, Switch, TooltipIcon } from '@/components/base'
 import { useVerge } from '@/hooks/use-verge'
 import { showNotice } from '@/services/notice-service'
+import { DEFAULT_DOWNLOAD_URL, validDownloadUrl } from '@/services/speedtest'
 
 export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
   const { t } = useTranslation()
@@ -31,6 +32,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
     enableAutoDelayDetection: false,
     autoDelayDetectionIntervalMinutes: 5,
     defaultLatencyTest: '',
+    downloadTestUrl: '',
     autoLogClean: 2,
     defaultLatencyTimeout: 10000,
   })
@@ -50,6 +52,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
         autoDelayDetectionIntervalMinutes:
           verge?.auto_delay_detection_interval_minutes ?? 5,
         defaultLatencyTest: verge?.default_latency_test || '',
+        downloadTestUrl: verge?.download_test_url || '',
         autoLogClean: verge?.auto_log_clean || 0,
         defaultLatencyTimeout: verge?.default_latency_timeout || 10000,
       })
@@ -58,6 +61,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
   }))
 
   const onSave = useLockFn(async () => {
+    if (!validDownloadUrl(values.downloadTestUrl)) return
     try {
       await patchVerge({
         app_log_level: values.appLogLevel,
@@ -71,6 +75,7 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
         auto_delay_detection_interval_minutes:
           values.autoDelayDetectionIntervalMinutes,
         default_latency_test: values.defaultLatencyTest,
+        download_test_url: values.downloadTestUrl.trim(),
         default_latency_timeout: values.defaultLatencyTimeout,
         auto_log_clean: values.autoLogClean as any,
       })
@@ -92,6 +97,23 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
       onOk={onSave}
     >
       <List>
+        <ListItem sx={{ padding: '5px 2px' }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={t('settings.modals.misc.fields.downloadTestUrl')}
+            placeholder={DEFAULT_DOWNLOAD_URL}
+            value={values.downloadTestUrl}
+            error={!validDownloadUrl(values.downloadTestUrl)}
+            helperText={t('settings.modals.misc.tooltips.downloadTestUrl')}
+            onChange={(event) =>
+              setValues((value) => ({
+                ...value,
+                downloadTestUrl: event.target.value,
+              }))
+            }
+          />
+        </ListItem>
         <ListItem sx={{ padding: '5px 2px' }}>
           <ListItemText
             primary={t('settings.modals.misc.fields.appLogLevel')}
