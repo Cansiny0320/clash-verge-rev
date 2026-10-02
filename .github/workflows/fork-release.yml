@@ -77,6 +77,7 @@ jobs:
         with:
           key: fork-windows-x64
           cache-all-crates: true
+          cache-on-failure: true
       - name: Prepare bundled core and service
         if: steps.plan.outputs.mode == 'build'
         run: pnpm prebuild x86_64-pc-windows-msvc
@@ -90,6 +91,15 @@ jobs:
       - name: Verify signature and prepare release manifest
         if: steps.plan.outputs.mode == 'build'
         run: node scripts/fork-release.mjs prepare
+      - name: Preserve signed release files for recovery
+        if: steps.plan.outputs.mode == 'build'
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-x64-${{ steps.plan.outputs.version }}-${{ github.sha }}
+          path: target/fork-release/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
       - name: Verify manifest with the Tauri updater parser
         if: steps.plan.outputs.mode == 'build'
         run: cargo run -p clash-verge --example verify_update_manifest --release --locked -- target/fork-release/update.json

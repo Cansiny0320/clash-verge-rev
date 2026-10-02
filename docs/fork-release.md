@@ -10,7 +10,7 @@ Publish signed installer artifacts and their `.sig` assets in a versioned releas
 
 Before the first release, checks report that the fork update source is unavailable; this is not proof that the installed version is current. A new cache directory prevents the fork from installing an upstream package cached by the previous application. The first fork build must be installed manually; upstream installations trust the upstream signing key.
 
-The workflow verifies the installer signature, parses the manifest with Tauri, uploads a draft release, and checks uploaded asset digests before publishing. It promotes `updater/update.json` only afterward and reads that public URL back. Manifests contain `version` without the duplicate `name` alias rejected by Tauri. A stale branch commit cannot publish. Do not advertise unbuilt platforms or replace an already published version with different source; raise the version for a new build.
+The workflow verifies the installer signature, parses the manifest with Tauri, uploads a draft release, and checks uploaded asset digests before publishing. Drafts are located through the release list and read by release ID because a draft's tag may not exist yet. Signed release files are retained as an Actions artifact for seven days, and Rust dependencies are cached even if publication fails. It promotes `updater/update.json` only afterward and reads that public URL back. Manifests contain `version` without the duplicate `name` alias rejected by Tauri. A stale branch commit cannot publish. Do not advertise unbuilt platforms or replace an already published version with different source; raise the version for a new build.
 
 ## Download testing
 

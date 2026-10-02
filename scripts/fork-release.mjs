@@ -173,7 +173,8 @@ async function publish(version) {
       '--notes-file',
       `${output}/release-notes.md`,
     )
-    release = api(`releases/tags/${tag}`)
+    release = api('releases?per_page=100').find((item) => item.tag_name === tag)
+    if (!release) throw new Error('Created draft release was not found')
   }
   if (release.draft) {
     if (release.target_commitish !== process.env.GITHUB_SHA)
@@ -190,7 +191,7 @@ async function publish(version) {
         .filter((file) => file !== 'release-notes.md')
         .map((file) => `${output}/${file}`),
     )
-    const uploaded = api(`releases/tags/${tag}`)
+    const uploaded = api(`releases/${release.id}`)
     for (const file of fs
       .readdirSync(output)
       .filter((file) => file !== 'release-notes.md')) {
