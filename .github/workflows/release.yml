@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   check_tag_version:
+    if: github.repository == 'clash-verge-rev/clash-verge-rev'
     name: Check Release Tag and package.json Version Consistency
     runs-on: ubuntu-latest
     steps:
