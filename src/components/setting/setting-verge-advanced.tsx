@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DialogRef, TooltipIcon } from '@/components/base'
-import { updateLastCheckTime } from '@/hooks/use-update'
+import { useUpdate } from '@/hooks/use-update'
 import {
   exitApp,
   exportDiagnosticInfo,
@@ -14,7 +14,6 @@ import {
   openLogsDir,
 } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
-import { checkUpdateSafe as checkUpdate } from '@/services/update'
 import { version } from '@root/package.json'
 
 import { BackupViewer } from './mods/backup-viewer'
@@ -33,6 +32,7 @@ interface Props {
 
 const SettingVergeAdvanced = ({ onError: _ }: Props) => {
   const { t } = useTranslation()
+  const { checkUpdate } = useUpdate()
 
   const configRef = useRef<DialogRef>(null)
   const hotkeyRef = useRef<DialogRef>(null)
@@ -45,8 +45,7 @@ const SettingVergeAdvanced = ({ onError: _ }: Props) => {
 
   const onCheckUpdate = async () => {
     try {
-      const info = await checkUpdate()
-      updateLastCheckTime()
+      const { data: info } = await checkUpdate()
       if (!info?.available) {
         showNotice.success(
           'settings.components.verge.advanced.notifications.latestVersion',

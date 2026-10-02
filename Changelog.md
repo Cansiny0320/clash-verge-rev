@@ -2,6 +2,7 @@
 
 - Add a test menu for groups and individual nodes to choose latency only or latency plus download speed.
 - Fix update checks failing to read the fork release manifest.
+- Fix manual update checks showing stale version information and preventing downloads.
 
 <details>
 <summary><strong> 🐞 修复问题 </strong></summary>
