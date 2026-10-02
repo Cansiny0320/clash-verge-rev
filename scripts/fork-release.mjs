@@ -113,6 +113,27 @@ function assertCurrentHead() {
     throw new Error('A newer dev commit exists; this run must not publish')
 }
 
+export function createDraft(tag) {
+  return JSON.parse(
+    gh(
+      'api',
+      `repos/${FORK_REPOSITORY}/releases`,
+      '--method',
+      'POST',
+      '-f',
+      `tag_name=${tag}`,
+      '-f',
+      `target_commitish=${process.env.GITHUB_SHA}`,
+      '-f',
+      `name=Clash Verge Rev ${tag} — Cansiny0320`,
+      '-F',
+      'draft=true',
+      '-F',
+      `body=@${output}/release-notes.md`,
+    ),
+  )
+}
+
 async function prepare(version) {
   const name = `Clash.Verge_${version}_x64-setup.exe`
   const file = `target/release/bundle/nsis/Clash Verge_${version}_x64-setup.exe`
@@ -158,24 +179,7 @@ async function publish(version) {
   let release = api('releases?per_page=100').find(
     (item) => item.tag_name === tag,
   )
-  if (!release) {
-    gh(
-      'release',
-      'create',
-      tag,
-      '--repo',
-      FORK_REPOSITORY,
-      '--target',
-      process.env.GITHUB_SHA,
-      '--draft',
-      '--title',
-      `Clash Verge Rev ${tag} — Cansiny0320`,
-      '--notes-file',
-      `${output}/release-notes.md`,
-    )
-    release = api('releases?per_page=100').find((item) => item.tag_name === tag)
-    if (!release) throw new Error('Created draft release was not found')
-  }
+  if (!release) release = createDraft(tag)
   if (release.draft) {
     if (release.target_commitish !== process.env.GITHUB_SHA)
       throw new Error('Draft release belongs to a different commit')

@@ -1,8 +1,30 @@
 import assert from 'node:assert/strict'
+import childProcess from 'node:child_process'
 import crypto from 'node:crypto'
+import { syncBuiltinESMExports } from 'node:module'
 import test from 'node:test'
 
-import { compareStable, releaseMode, verifyInstaller } from './fork-release.mjs'
+import {
+  compareStable,
+  createDraft,
+  releaseMode,
+  verifyInstaller,
+} from './fork-release.mjs'
+
+test('draft creation uses its response even when the release list is stale', (t) => {
+  const draft = { id: 42, tag_name: 'v2.5.7', draft: true }
+  t.mock.method(childProcess, 'execFileSync', (_command, args) => {
+    if (args[0] === 'release') return 'https://github.com/example/draft'
+    return JSON.stringify(args.includes('POST') ? draft : [])
+  })
+  syncBuiltinESMExports()
+  try {
+    assert.deepEqual(createDraft('v2.5.7'), draft)
+  } finally {
+    t.mock.restoreAll()
+    syncBuiltinESMExports()
+  }
+})
 
 test('release decisions require a higher stable version except same-commit promotion retries', () => {
   assert.equal(releaseMode('2.5.6', '2.5.5'), 'build')
