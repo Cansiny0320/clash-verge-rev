@@ -128,6 +128,10 @@
     "error": "測速失敗",
     "cancelled": "已停止",
     "finished": "已完成",
-    "description": "到指定伺服器的下載速度；每節點最多採樣 5 秒或下載 50 MB。"
+    "description": "到指定伺服器的下載速度；每節點最多採樣 5 秒或下載 50 MB。",
+    "chooseMode": "選擇測試方式",
+    "latencyOnly": "僅延遲",
+    "withDownload": "延遲＋下載速度（每節點最多 50 MB）",
+    "latencyTesting": "正在測延遲…"
   }
 }

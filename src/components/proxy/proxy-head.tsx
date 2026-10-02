@@ -21,10 +21,10 @@ import { BaseSearchBox } from '@/components/base'
 import { useVerge } from '@/hooks/use-verge'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
-import { speedTestStore } from '@/services/speedtest'
-import { debugLog } from '@/utils/debug'
+import { speedTestStore, type SpeedTestMode } from '@/services/speedtest'
 import { isValidUrl } from '@/utils/network'
 
+import { ProxyTestMenu } from './proxy-test-menu'
 import type { ProxySortType } from './use-filter-sort'
 import type { HeadState } from './use-head-state'
 
@@ -34,7 +34,7 @@ interface Props {
   groupName: string
   headState: HeadState
   onLocation: () => void
-  onCheckDelay: () => void
+  onCheckDelay: (mode?: SpeedTestMode) => void
   onHeadState: (val: Partial<HeadState>) => void
 }
 
@@ -84,6 +84,20 @@ export const ProxyHead = ({
     delayManager.setUrl(groupName, testUrl?.trim() || url || defaultLatencyUrl)
   }, [groupName, testUrl, defaultLatencyUrl, url])
 
+  const runTest = (mode: SpeedTestMode = 'download') => {
+    if (testing) {
+      onCheckDelay(mode)
+      return
+    }
+    if (testUrl?.trim() && textState !== 'filter')
+      onHeadState({ textState: 'url' })
+    if (testUrl?.trim() && !isValidUrl(testUrl)) {
+      showNotice.warning('proxies.feedback.warnings.invalidTestUrl')
+      return
+    }
+    onCheckDelay(mode)
+  }
+
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ...sx }}>
       <IconButton
@@ -107,30 +121,21 @@ export const ProxyHead = ({
               })
             : t('proxies.speed.start')
         }
-        onClick={() => {
-          debugLog(`[ProxyHead] 点击延迟测试按钮，组: ${groupName}`)
-          if (testing) {
-            onCheckDelay()
-            return
-          }
-          // Remind the user that it is custom test url
-          if (testUrl?.trim() && textState !== 'filter') {
-            debugLog(`[ProxyHead] 使用自定义测试URL: ${testUrl}`)
-            onHeadState({ textState: 'url' })
-          }
-          if (testUrl?.trim() && !isValidUrl(testUrl)) {
-            showNotice.warning('proxies.feedback.warnings.invalidTestUrl')
-            return
-          }
-          onCheckDelay()
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          runTest()
         }}
       >
         {testing ? <StopRounded /> : <NetworkCheckRounded />}
       </IconButton>
+      <ProxyTestMenu onSelect={runTest} />
 
       {testing && (
         <Box component="span" sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-          {batch.completed}/{batch.total}
+          {batch.phase === 'latency'
+            ? t('proxies.speed.latencyTesting')
+            : `${batch.completed}/${batch.total}`}
         </Box>
       )}
 

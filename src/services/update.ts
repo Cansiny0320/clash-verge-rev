@@ -76,7 +76,6 @@ export const checkUpdateSafe = async (
   const result = await check({
     timeout: 15000,
     ...(options ?? {}),
-    allowDowngrades: false,
   }).catch((error: unknown) => {
     throw new Error(
       i18n.t(
@@ -92,7 +91,11 @@ export const checkUpdateSafe = async (
   const remoteVersion = resolveRemoteVersion(result)
   const comparison = compareVersions(remoteVersion, localVersionNormalized)
 
-  if (comparison !== null && comparison <= 0) {
+  const isBuildToStable =
+    /^\d+\.\d+\.\d+\+[0-9A-Za-z.-]+$/.test(localVersionNormalized ?? '') &&
+    remoteVersion === localVersionNormalized?.split('+')[0]
+
+  if (comparison !== null && comparison <= 0 && !isBuildToStable) {
     try {
       await result.close()
     } catch (err) {

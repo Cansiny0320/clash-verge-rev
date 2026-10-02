@@ -1,0 +1,98 @@
+name: Fork Release
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fork-stable-release
+  cancel-in-progress: false
+
+env:
+  HUSKY: 0
+
+jobs:
+  check:
+    if: github.repository == 'Cansiny0320/clash-verge-rev' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.21.0'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: node --test scripts/fork-updates.test.mjs scripts/fork-release.test.mjs
+      - name: Decide whether this version needs publishing
+        id: plan
+        run: node scripts/fork-release.mjs plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  release:
+    needs: check
+    if: needs.check.outputs.mode != 'skip'
+    runs-on: windows-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    env:
+      CARGO_INCREMENTAL: 0
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.21.0'
+          cache: pnpm
+      - name: Recheck release state
+        id: plan
+        run: node scripts/fork-release.mjs plan
+      - name: Install dependencies
+        if: steps.plan.outputs.mode == 'build'
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Install Rust
+        if: steps.plan.outputs.mode == 'build'
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98.1'
+      - name: Cache Rust dependencies
+        if: steps.plan.outputs.mode == 'build'
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: fork-windows-x64
+          cache-all-crates: true
+      - name: Prepare bundled core and service
+        if: steps.plan.outputs.mode == 'build'
+        run: pnpm prebuild x86_64-pc-windows-msvc
+      - name: Build signed Windows installer
+        if: steps.plan.outputs.mode == 'build'
+        run: pnpm exec tauri build --ci --bundles nsis -- --locked
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.FORK_TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+      - name: Verify signature and prepare release manifest
+        if: steps.plan.outputs.mode == 'build'
+        run: node scripts/fork-release.mjs prepare
+      - name: Verify manifest with the Tauri updater parser
+        if: steps.plan.outputs.mode == 'build'
+        run: cargo run -p clash-verge --example verify_update_manifest --release --locked -- target/fork-release/update.json
+      - name: Publish complete release and promote update channel
+        if: steps.plan.outputs.mode != 'skip'
+        run: node scripts/fork-release.mjs publish

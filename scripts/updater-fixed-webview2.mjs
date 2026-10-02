@@ -1,7 +1,6 @@
 import { context, getOctokit } from '@actions/github'
 
-import { requireForkRepository, validatePlatforms } from './fork-updates.mjs'
-
+import { requireForkRepository, validateManifest } from './fork-updates.mjs'
 import { resolveUpdateLog } from './updatelog.mjs'
 
 const UPDATE_TAG_NAME = 'updater'
@@ -17,25 +16,15 @@ async function resolveUpdater() {
   const options = { owner: context.repo.owner, repo: context.repo.repo }
   const github = getOctokit(process.env.GITHUB_TOKEN)
 
-  const { data: tags } = await github.rest.repos.listTags({
-    ...options,
-    per_page: 10,
-    page: 1,
-  })
-
-  const tag = tags.find((t) => t.name.startsWith('v'))
+  const { data: latestRelease } =
+    await github.rest.repos.getLatestRelease(options)
+  const tag = { name: latestRelease.tag_name }
 
   console.log(tag)
   console.log()
 
-  const { data: latestRelease } = await github.rest.repos.getReleaseByTag({
-    ...options,
-    tag: tag.name,
-  })
-
   const updateData = {
     version: tag.name.replace(/^v/, ''),
-    name: tag.name,
     notes: await resolveUpdateLog(tag.name), // use Changelog.md
     pub_date: new Date().toISOString(),
     platforms: {
@@ -86,7 +75,7 @@ async function resolveUpdater() {
     }
   })
 
-  validatePlatforms(updateData.platforms)
+  validateManifest(updateData)
 
   const updateDataNew = JSON.parse(JSON.stringify(updateData))
 

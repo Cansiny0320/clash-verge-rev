@@ -20,11 +20,12 @@ import { useTranslation } from 'react-i18next'
 import { useVerge } from '@/hooks/use-verge'
 import delayManager from '@/services/delay'
 import { showNotice } from '@/services/notice-service'
-import { speedTestStore } from '@/services/speedtest'
+import { speedTestStore, type SpeedTestMode } from '@/services/speedtest'
 import { isValidUrl } from '@/utils/network'
 
 import { BaseSearchBox, type SearchState } from '../base'
 
+import { ProxyTestMenu } from './proxy-test-menu'
 import type { ProxySortType } from './use-filter-sort'
 import type { HeadState } from './use-head-state'
 
@@ -35,7 +36,7 @@ interface Props {
   groupName: string
   headState: HeadState
   onLocation: () => void
-  onCheckDelay: () => void
+  onCheckDelay: (mode?: SpeedTestMode) => void
   onHeadState: (val: Partial<HeadState>) => void
 }
 
@@ -140,6 +141,23 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
     </>
   )
 
+  const runTest = (mode: SpeedTestMode = 'download') => {
+    if (!headState.open)
+      // eslint-disable-next-line @eslint-react/dom-no-flush-sync
+      flushSync(() => onHeadState({ open: true }))
+    if (testing) {
+      onCheckDelay(mode)
+      return
+    }
+    if (testUrl?.trim() && textState !== 'filter')
+      onHeadState({ textState: 'url' })
+    if (testUrl?.trim() && !isValidUrl(testUrl)) {
+      showNotice.warning('proxies.feedback.warnings.invalidTestUrl')
+      return
+    }
+    onCheckDelay(mode)
+  }
+
   return (
     <Box
       sx={{
@@ -182,25 +200,10 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
               })
             : t('proxies.speed.start')
         }
-        onClick={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          if (!headState.open)
-            // eslint-disable-next-line @eslint-react/dom-no-flush-sync
-            flushSync(() => onHeadState({ open: true }))
-          if (testing) {
-            onCheckDelay()
-            return
-          }
-          // Remind the user that it is custom test url
-          if (testUrl?.trim() && textState !== 'filter') {
-            onHeadState({ textState: 'url' })
-          }
-          if (testUrl?.trim() && !isValidUrl(testUrl)) {
-            showNotice.warning('proxies.feedback.warnings.invalidTestUrl')
-            return
-          }
-          onCheckDelay()
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          runTest()
         }}
       >
         {testing ? (
@@ -209,10 +212,13 @@ export const ProxyGroupTools = memo(function ProxyGroupTools(props: Props) {
           <NetworkCheckRounded fontSize="inherit" />
         )}
       </IconButton>
+      <ProxyTestMenu onSelect={runTest} />
 
       {testing && (
         <Box component="span" sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-          {batch.completed}/{batch.total}
+          {batch.phase === 'latency'
+            ? t('proxies.speed.latencyTesting')
+            : `${batch.completed}/${batch.total}`}
         </Box>
       )}
 

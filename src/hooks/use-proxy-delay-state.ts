@@ -4,7 +4,7 @@ import { useCallback, useEffect, useReducer } from 'react'
 import { useVerge } from '@/hooks/use-verge'
 import { useProxiesData } from '@/providers/app-data-context'
 import delayManager, { type DelayUpdate } from '@/services/delay'
-import { speedTestStore } from '@/services/speedtest'
+import { speedTestStore, type SpeedTestMode } from '@/services/speedtest'
 import {
   isInteractableMember,
   memberDetails,
@@ -28,7 +28,7 @@ export interface UseProxyDelayState {
   delayValue: number
   isPreset: boolean
   timeout: number
-  onDelay: () => Promise<void>
+  onDelay: (mode?: SpeedTestMode) => Promise<void>
 }
 
 export function useProxyDelayState(
@@ -86,9 +86,9 @@ export function useProxyDelayState(
     updateDelay()
   }, [updateDelay])
 
-  const onDelay = useLockFn(async () => {
+  const onDelay = useLockFn(async (mode: SpeedTestMode = 'download') => {
     if (!isInteractableMember(member) || !proxyView) return
-    await speedTestStore.runSingle(groupName, member, proxyView, timeout)
+    await speedTestStore.runSingle(groupName, member, proxyView, timeout, mode)
   })
 
   return {

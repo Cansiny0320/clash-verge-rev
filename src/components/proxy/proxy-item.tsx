@@ -22,6 +22,7 @@ import {
 } from '@/types/proxy-view'
 
 import { ProxySpeed } from './proxy-speed'
+import { ProxyTestMenu } from './proxy-test-menu'
 
 interface Props {
   group: ProxyGroupView
@@ -145,54 +146,64 @@ export const ProxyItem = (props: Props) => {
             display: isPreset ? 'none' : '',
           }}
         >
-          {!unresolved && delayValue === -2 && (
-            <Widget>
-              <BaseLoading />
-            </Widget>
-          )}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {!unresolved && delayValue === -2 && (
+              <Widget>
+                <BaseLoading />
+              </Widget>
+            )}
 
-          {!unresolved && delayValue !== -2 && (
-            <Widget
-              className="the-check"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                void onDelay()
+            {!unresolved && delayValue !== -2 && (
+              <Widget
+                className="the-check"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  void onDelay()
+                }}
+                sx={({ palette }) => ({
+                  display: 'none', // hover 时显示
+                  ':hover': { bgcolor: alpha(palette.primary.main, 0.15) },
+                })}
+              >
+                {t('shared.actions.check')}
+              </Widget>
+            )}
+
+            {!unresolved && delayValue > 0 && (
+              // 显示延迟
+              <Widget
+                className="the-delay"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  void onDelay()
+                }}
+                sx={({ palette }) => ({
+                  color: delayManager.formatDelayColor(delayValue, timeout),
+                  ':hover': { bgcolor: alpha(palette.primary.main, 0.15) },
+                })}
+              >
+                {delayManager.formatDelay(delayValue, timeout)}
+              </Widget>
+            )}
+
+            {!unresolved &&
+              delayValue !== -2 &&
+              delayValue <= 0 &&
+              selected && (
+                // 展示已选择的 icon
+                <CheckCircleOutlineRounded
+                  className="the-icon"
+                  sx={{ fontSize: 16 }}
+                />
+              )}
+            <ProxyTestMenu
+              onSelect={(mode) => {
+                void onDelay(mode)
               }}
-              sx={({ palette }) => ({
-                display: 'none', // hover 时显示
-                ':hover': { bgcolor: alpha(palette.primary.main, 0.15) },
-              })}
-            >
-              {t('shared.actions.check')}
-            </Widget>
-          )}
-
-          {!unresolved && delayValue > 0 && (
-            // 显示延迟
-            <Widget
-              className="the-delay"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                void onDelay()
-              }}
-              sx={({ palette }) => ({
-                color: delayManager.formatDelayColor(delayValue, timeout),
-                ':hover': { bgcolor: alpha(palette.primary.main, 0.15) },
-              })}
-            >
-              {delayManager.formatDelay(delayValue, timeout)}
-            </Widget>
-          )}
-
-          {!unresolved && delayValue !== -2 && delayValue <= 0 && selected && (
-            // 展示已选择的 icon
-            <CheckCircleOutlineRounded
-              className="the-icon"
-              sx={{ fontSize: 16 }}
             />
-          )}
+          </Box>
           <ProxySpeed group={group.name} member={member} />
         </ListItemIcon>
       </ListItemButton>

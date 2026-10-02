@@ -23,7 +23,7 @@ import { useProxySelection } from '@/hooks/use-proxy-selection'
 import { useVerge } from '@/hooks/use-verge'
 import { useProxiesData, useSystemData } from '@/providers/app-data-context'
 import delayManager from '@/services/delay'
-import { speedTestStore } from '@/services/speedtest'
+import { speedTestStore, type SpeedTestMode } from '@/services/speedtest'
 import {
   isInteractableMember,
   resolveMember,
@@ -111,43 +111,51 @@ function useProxyRenderState(
 
   const timeout = verge?.default_latency_timeout || 10000
 
-  const handleCheckAll = useStableCallback(async (groupName: string) => {
-    if (speedTestStore.batch()) {
-      if (speedTestStore.batch()?.group === groupName)
-        await speedTestStore.cancel()
-      return
-    }
-    debugLog(`[ProxyGroups] 开始测试所有延迟，组: ${groupName}`)
+  const handleCheckAll = useStableCallback(
+    async (groupName: string, mode: SpeedTestMode = 'download') => {
+      if (speedTestStore.batch()) {
+        if (speedTestStore.batch()?.group === groupName)
+          await speedTestStore.cancel()
+        return
+      }
+      debugLog(`[ProxyGroups] 开始测试所有延迟，组: ${groupName}`)
 
-    const group =
-      proxyView?.groups.find(({ name }) => name === groupName) ??
-      (proxyView?.global?.name === groupName ? proxyView.global : undefined)
-    const occurrences =
-      proxyView && group
-        ? group.members.map((member, memberIndex) => ({
-            memberIndex,
-            member: resolveMember(proxyView, member),
-          }))
-        : []
-    const interactable = occurrences
-      .map(({ member }) => member)
-      .filter(isInteractableMember)
+      const group =
+        proxyView?.groups.find(({ name }) => name === groupName) ??
+        (proxyView?.global?.name === groupName ? proxyView.global : undefined)
+      const occurrences =
+        proxyView && group
+          ? group.members.map((member, memberIndex) => ({
+              memberIndex,
+              member: resolveMember(proxyView, member),
+            }))
+          : []
+      const interactable = occurrences
+        .map(({ member }) => member)
+        .filter(isInteractableMember)
 
-    debugLog(`[ProxyGroups] 找到代理数量: ${interactable.length}`)
+      debugLog(`[ProxyGroups] 找到代理数量: ${interactable.length}`)
 
-    const url = delayManager.getUrl(groupName)
-    debugLog(`[ProxyGroups] 测试URL: ${url}, 超时: ${timeout}ms`)
+      const url = delayManager.getUrl(groupName)
+      debugLog(`[ProxyGroups] 测试URL: ${url}, 超时: ${timeout}ms`)
 
-    try {
-      if (proxyView)
-        await speedTestStore.run(groupName, interactable, proxyView, timeout)
-      debugLog(`[ProxyGroups] 延迟测试完成，组: ${groupName}`)
-    } catch (error) {
-      console.error(`[ProxyGroups] 延迟测试出错，组: ${groupName}`, error)
-    } finally {
-      onProxies()
-    }
-  })
+      try {
+        if (proxyView)
+          await speedTestStore.run(
+            groupName,
+            interactable,
+            proxyView,
+            timeout,
+            mode,
+          )
+        debugLog(`[ProxyGroups] 延迟测试完成，组: ${groupName}`)
+      } catch (error) {
+        console.error(`[ProxyGroups] 延迟测试出错，组: ${groupName}`, error)
+      } finally {
+        onProxies()
+      }
+    },
+  )
 
   const saveScrollPosition = useCallback(
     (scrollTop: number) => {

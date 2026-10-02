@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useProxiesData } from '@/providers/app-data-context'
 import { updateProxyChainConfigInRuntime } from '@/services/cmds'
+import type { SpeedTestMode } from '@/services/speedtest'
 import {
   isInteractableMember,
   type ProxyGroupView,
@@ -89,7 +90,7 @@ interface ProxyGroupsChainProps {
   measureElement: (node: Element | null) => void
 
   // Shared callbacks
-  onCheckAll: (groupName: string) => void
+  onCheckAll: (groupName: string, mode?: SpeedTestMode) => void
   onHeadState: (groupName: string, patch: Partial<HeadState>) => void
   onLocation: (group: any) => void
   onGroupSelect: (groupName: string) => void
@@ -244,7 +245,7 @@ function ProxyVirtualList({
   isChainMode?: boolean
   measureElement: (node: Element | null) => void
   onLocation: (group: any) => void
-  onCheckAll: (groupName: string) => void
+  onCheckAll: (groupName: string, mode?: SpeedTestMode) => void
   onHeadState: (groupName: string, patch: Partial<HeadState>) => void
   onChangeProxy: (group: ProxyGroupView, member: ResolvedProxyMember) => void
 }) {

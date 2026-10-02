@@ -10,6 +10,7 @@ import {
 
 export const DEFAULT_DOWNLOAD_URL =
   'https://speed.cloudflare.com/__down?bytes=50000000'
+export type SpeedTestMode = 'latency' | 'download'
 export type SpeedStatus =
   | 'queued'
   | 'testing'
@@ -134,10 +135,11 @@ export class SpeedTestStore {
     member: InteractableProxyMember,
     view: ProxyViewV1,
     timeout: number,
+    mode: SpeedTestMode = 'download',
   ) {
     // A card click must not toggle off another node or an active group batch.
     if (this.active) return
-    await this.run(group, [member], view, timeout)
+    await this.run(group, [member], view, timeout, mode)
   }
 
   async run(
@@ -145,12 +147,14 @@ export class SpeedTestStore {
     members: InteractableProxyMember[],
     view: ProxyViewV1,
     timeout: number,
+    mode: SpeedTestMode = 'download',
   ) {
     if (this.active) {
       if (this.active.group === group) await this.cancel()
       return
     }
-    const targets = resolveSpeedTargets(members, view)
+    const targets =
+      mode === 'download' ? resolveSpeedTargets(members, view) : []
     const id = crypto.randomUUID()
     const abort = new AbortController()
     this.abort = abort
@@ -159,12 +163,14 @@ export class SpeedTestStore {
       group,
       phase: 'latency',
       completed: 0,
-      total: targets.length,
+      total: mode === 'download' ? targets.length : members.length,
       stopping: false,
     }
-    for (const member of members) {
-      const key = speedKey(member)
-      this.results.delete(JSON.stringify([group, key]))
+    if (mode === 'download') {
+      for (const member of members) {
+        const key = speedKey(member)
+        this.results.delete(JSON.stringify([group, key]))
+      }
     }
     for (const target of targets)
       this.put(group, { key: target.key, status: 'queued', bytes: 0 })

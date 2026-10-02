@@ -1,5 +1,11 @@
 export const FORK_REPOSITORY = 'Cansiny0320/clash-verge-rev'
 
+export function validateManifest(manifest) {
+  if ('version' in manifest && 'name' in manifest)
+    throw new Error('Duplicate version field: name is an alias of version')
+  validatePlatforms(manifest.platforms)
+}
+
 export function requireForkRepository({ owner, repo }) {
   if (`${owner}/${repo}` !== FORK_REPOSITORY) {
     throw new Error(

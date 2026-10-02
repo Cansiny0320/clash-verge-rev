@@ -24,13 +24,13 @@ async fn server(
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
     let port = listener.local_addr()?.port();
     let requests = Arc::new(AtomicUsize::new(0));
-    let count = requests.clone();
+    let count = Arc::clone(&requests);
     let headers = format!(
         "HTTP/1.1 {status}\r\nContent-Type: {content_type}\r\nContent-Length: {size}\r\nConnection: close\r\n\r\n"
     );
     let task = tokio::spawn(async move {
         while let Ok((mut stream, _)) = listener.accept().await {
-            let count = count.clone();
+            let count = Arc::clone(&count);
             let headers = headers.clone();
             tokio::spawn(async move {
                 let result: Result<()> = async {
@@ -41,7 +41,7 @@ async fn server(
                     }
                     count.fetch_add(1, Ordering::SeqCst);
                     stream.write_all(headers.as_bytes()).await?;
-                    let chunk = [42_u8; 16384];
+                    let chunk = vec![42_u8; 16384];
                     let mut remaining = size;
                     while remaining > 0 {
                         let length = remaining.min(chunk.len());
@@ -161,7 +161,7 @@ async fn real_core_keeps_same_named_provider_nodes_separate_and_cleans_up() -> R
     #[cfg(windows)]
     {
         session.job = Some(crate::core::manager::create_and_assign_sidecar_job(
-            session.child.as_ref().unwrap().id(),
+            session.child.as_ref().context("Test core must be running")?.id(),
         )?);
     }
     let api = reqwest::Client::builder()
@@ -180,7 +180,12 @@ async fn real_core_keeps_same_named_provider_nodes_separate_and_cleans_up() -> R
             {
                 break;
             }
-            if let Some(status) = session.child.as_mut().unwrap().try_wait()? {
+            if let Some(status) = session
+                .child
+                .as_mut()
+                .context("Test core must be running")?
+                .try_wait()?
+            {
                 bail!("Test core exited: {status}");
             }
             tokio::time::sleep(Duration::from_millis(50)).await;

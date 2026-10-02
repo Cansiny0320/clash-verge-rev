@@ -23,6 +23,31 @@ const node = (name: string, provider: string): InteractableProxyMember =>
   }) as InteractableProxyMember
 
 describe('group download test', () => {
+  test.each(['group', 'single'] as const)(
+    '%s latency-only testing never downloads or replaces saved speeds',
+    async (scope) => {
+      let event!: (value: SpeedEvent) => void
+      const delay = vi.fn(async () => {})
+      const start = vi.fn(async (_id, _targets, _selections, callback) => {
+        event = callback
+      })
+      const store = new SpeedTestStore({ delay, start, cancel: vi.fn() })
+      const member = node('n', 'p')
+      const view = { groups: [] } as unknown as ProxyViewV1
+      await store.run('g', [member], view, 1000)
+      event({ key: 'pn', status: 'done', bytes: 1000, bytesPerSecond: 2000 })
+      event({ key: '', status: 'finished', bytes: 0 })
+      start.mockClear()
+      if (scope === 'single')
+        await store.runSingle('g', member, view, 1000, 'latency')
+      else await store.run('g', [member], view, 1000, 'latency')
+      expect(delay).toHaveBeenCalledTimes(2)
+      expect(start).not.toHaveBeenCalled()
+      expect(store.batch()).toBeNull()
+      expect(store.result('g', 'pn')?.bytesPerSecond).toBe(2000)
+    },
+  )
+
   test('single-node testing measures only the clicked provider node and preserves other results', async () => {
     let event!: (value: SpeedEvent) => void
     const delay = vi.fn(async (_members: InteractableProxyMember[]) => {})
